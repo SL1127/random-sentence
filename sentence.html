@@ -1,0 +1,80 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Sentence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quantico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: white;
+      font-family: 'Quantico', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #input-container {
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+    }
+
+    input {
+      font-size: 18px;
+      padding: 10px;
+      width: 100%;
+      background-color: #333;
+      color: white;
+      border: 1px solid white;
+      margin-bottom: 10px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div id="input-container">
+    <h1>Submit Your Sentence</h1>
+    <input type="text" id="sentence-input" placeholder="Enter your sentence here">
+    <button onclick="submitSentence()">Submit Sentence</button>
+  </div>
+
+  <script>
+    // Function to submit sentence and keep storage
+    function submitSentence() {
+      let sentence = document.getElementById('sentence-input').value.trim();
+      if (sentence) {
+        // Retrieve the existing sentences from localStorage
+        let sentences = JSON.parse(localStorage.getItem('sentences')) || [];
+
+        // Add the new sentence to the list
+        sentences.push(sentence);
+
+        // Save the updated list of sentences in localStorage
+        localStorage.setItem('sentences', JSON.stringify(sentences));
+
+        // Clear the input field after submission
+        document.getElementById('sentence-input').value = '';
+
+        // Provide feedback to the user
+        alert("Sentence submitted successfully!");
+      } else {
+        alert("Please enter a valid sentence!");
+      }
+    }
+  </script>
+</body>

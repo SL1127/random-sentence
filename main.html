@@ -1,0 +1,154 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Sentence Animation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quantico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #input-container {
+      color: white;
+      font-family: 'Quantico', sans-serif;
+      font-size: 20px;
+      text-align: center;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    input {
+      font-size: 18px;
+      padding: 10px;
+      width: 300px;
+      background-color: #333;
+      color: white;
+      border: 1px solid white;
+      margin-bottom: 10px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="input-container">
+    <button onclick="deleteAllSentences()">Delete All Sentences</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+  <script>
+    let sentences = [];
+    let speeds = [];
+    let xPositions = [];
+    let yPositions = [];
+    let randomWords = ["DON'T ", "NOT ", "HATE ", "*****", "HORRIBLE ", "WORSE ", "AWFUL ", "TERRIBLE "];
+    let sentenceSizes = [];
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      textAlign(LEFT, CENTER);
+      textFont('Quantico');
+      loadSentencesFromStorage();
+    }
+
+    function loadSentencesFromStorage() {
+      let storedSentences = localStorage.getItem('sentences');
+      if (storedSentences) {
+        sentences = JSON.parse(storedSentences);
+        for (let i = 0; i < sentences.length; i++) {
+          let words = sentences[i].split(' ');
+
+          if (words.length > 1) {
+            words[1] = random(randomWords);
+          }
+          sentences[i] = words.join(' ');
+          sentenceSizes[i] = random(5, 40);
+          xPositions[i] = -textWidth(sentences[i]);
+          yPositions[i] = random(height);
+          speeds[i] = random(1, 3);
+        }
+      }
+    }
+
+    function draw() {
+      setGradient(0, 0, width, height, color(0), color(100));
+
+      fill(225);
+
+      for (let i = 0; i < sentences.length; i++) {
+        let words = sentences[i].split(' ');
+        textSize(sentenceSizes[i]);
+        text(words[0], xPositions[i], yPositions[i]);
+
+        // second word red
+        if (words.length > 1) {
+          fill(255, 0, 0);
+          text(words[1], xPositions[i] + textWidth(words[0]) + 10, yPositions[i]);
+          fill(225);
+        }
+
+        let remainingWords = words.slice(2).join(' ');
+        if (remainingWords.length > 0) {
+          text(remainingWords, xPositions[i] + textWidth(words[0]) + (words.length > 1 ? textWidth(words[1]) + 10 : 0), yPositions[i]);
+        }
+
+        xPositions[i] += speeds[i];
+
+        if (xPositions[i] > width) {
+          xPositions[i] = -textWidth(sentences[i]);
+          yPositions[i] = random(height);
+          speeds[i] = random(2, 5);
+
+          // new random word
+          let words = sentences[i].split(' ');
+          if (words.length > 1) {
+            words[1] = random(randomWords);
+          }
+          sentences[i] = words.join(' ');
+
+          sentenceSizes[i] = random(24, 72);
+        }
+      }
+    }
+
+    function setGradient(x, y, w, h, c1, c2) {
+      noFill();
+      for (let i = y; i <= y + h; i++) {
+        let inter = map(i, y, y + h, 0, 1);
+        let c = lerpColor(c1, c2, inter);
+        stroke(c);
+        line(x, i, x + w, i);
+      }
+    }
+
+    // Delete all sentences from localStorage and update the page
+    function deleteAllSentences() {
+      localStorage.removeItem('sentences'); // Remove sentences from localStorage
+      sentences = []; // Clear the sentences array
+      alert('All sentences have been deleted!');
+    }
+  </script>
+</body>
